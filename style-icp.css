@@ -1,0 +1,28 @@
+body {
+  background:#eef4f7;
+}
+
+.container {
+  border-top:6px solid #00a3c4;
+}
+
+h1 {
+  color:#004b5f;
+}
+
+.tools button {
+  background:#00a3c4;
+}
+
+.tools button:hover {
+  background:#007c96;
+}
+
+canvas {
+  border-radius:6px;
+}
+
+#preview {
+  margin:auto;
+  display:block;
+}
