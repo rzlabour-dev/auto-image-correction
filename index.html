@@ -1,179 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <head>
-  ...
-  <link rel="stylesheet" href="style-icp.css">
-</head>
-
   <meta charset="UTF-8" />
   <title>Auto Image Correction Tool</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style-icp.css">
+
+  <!-- Page CSS -->
   <style>
-    body { font-family: Arial, sans-serif; background:#f4f6f8; padding:20px; }
-    .container { max-width:800px; margin:auto; background:#fff; padding:20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
-    h1 { text-align:center; }
-    .tools <div class="tools-section">
-  <h3>Resize</h3>
-  ...
-</div>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 20px;
+    }
 
-<div class="tools-section">
-  <h3>Crop</h3>
-  ...
-</div>
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
 
-<div class="tools-section">
-  <h3>Rotate & Background</h3>
-  ...
-</div>
+    h1 { text-align: center; }
 
-    input, select { margin:5px 0; }
-    canvas { display:block; margin:15px auto; border:1px solid #ccc; background:#fff; }
-    button { padding:8px 12px; background:#007bff; color:#fff; border:none; border-radius:5px; cursor:pointer; }
-    button:hover { background:#0056b3; }
-    label { font-size:14px; }
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .drop-zone {
+      border: 2px dashed #00a3c4;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 6px;
+      margin-bottom: 15px;
+    }
+
+    .drop-zone.hover {
+      background: #e6f7fb;
+    }
+
+    .tools-section {
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #eee;
+      border-radius: 6px;
+    }
+
+    .tools-section h3 {
+      margin-top: 0;
+      font-size: 16px;
+      color: #007bff;
+    }
+
+    label {
+      font-size: 14px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 5px;
+      margin-bottom: 8px;
+    }
+
+    button {
+      padding: 8px 12px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 4px 0;
+      width: 100%;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    canvas {
+      display: block;
+      margin: 10px auto;
+      border: 1px solid #ccc;
+      background: #fff;
+    }
+
+    .preview-panel {
+      text-align: center;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
+    }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <h1>Auto Image Correction</h1>
-    <p>Resize • Crop • Rotate • Compress • Background Fill</p>
+<div class="container">
+  <h1>Auto Image Correction</h1>
+  <p style="text-align:center;">Resize • Crop • Rotate • Compress • Background Fill</p>
 
-    <div id="dropZone" class="drop-zone">
-  <p>Drag & Drop Image Here<br>or Click to Upload</p>
-  <input type="file" id="upload" accept="image/*" hidden />
-</div>
-    const dropZone = document.getElementById('dropZone');
+  <div class="layout">
 
-dropZone.onclick = () => upload.click();
+    <!-- LEFT PANEL -->
+    <div>
 
-dropZone.addEventListener('dragover', e => {
-  e.preventDefault();
-  dropZone.classList.add('hover');
-});
+      <!-- Upload -->
+      <div id="dropZone" class="drop-zone">
+        <p><strong>Drag & Drop Image</strong><br>or Click to Upload</p>
+        <input type="file" id="upload" accept="image/*" hidden>
+      </div>
 
-dropZone.addEventListener('dragleave', () => {
-  dropZone.classList.remove('hover');
-});
+      <!-- Resize -->
+      <div class="tools-section">
+        <h3>Resize</h3>
+        <label>Width</label>
+        <input type="number" id="w" value="300">
+        <label>Height</label>
+        <input type="number" id="h" value="400">
+        <button onclick="resizeImage()">Resize</button>
+      </div>
 
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  upload.files = e.dataTransfer.files;
-  upload.dispatchEvent(new Event('change'));
-});  
+      <!-- Crop -->
+      <div class="tools-section">
+        <h3>Crop & Face</h3>
+        <button onclick="applyCrop()">Apply Crop</button>
+        <button onclick="passportAutoCrop()">Passport Auto Crop</button>
+        <button onclick="drawFaceGuides()">Face Guide</button>
+        <button onclick="checkICPRules()">ICP Check</button>
+      </div>
 
-    <div class="tools">
-      <label>Width: <input type="number" id="w" value="300"></label>
-      <label>Height: <input type="number" id="h" value="400"></label>
-      <button onclick="resizeImage()">Resize</button>
-      <button onclick="applyCrop()">Apply Crop</button>
-      <button onclick="drawFaceGuides()">Face Guide</button>
-      <button onclick="checkICPRules()">ICP Check</button>
+      <!-- Rotate -->
+      <div class="tools-section">
+        <h3>Rotate & Background</h3>
+        <label>Rotate (degrees)</label>
+        <input type="number" id="rotate" value="0">
+        <button onclick="rotateImage()">Rotate</button>
+        <button onclick="whiteBackground()">White Background</button>
+        <button onclick="resetCanvas()">Reset</button>
+      </div>
 
-
-
-
-      <label>Rotate: <input type="number" id="rotate" value="0">°</label>
-      <button onclick="rotateImage()">Rotate</button>
-
-      <button onclick="passportAutoCrop()">Passport Auto Crop</button>
-
-      <label>Quality:
+      <!-- Download -->
+      <div class="tools-section">
+        <h3>Download</h3>
+        <label>Quality</label>
         <select id="quality">
           <option value="0.9">High</option>
           <option value="0.7">Medium</option>
           <option value="0.5">Low</option>
         </select>
-      </label>
-      <button onclick="downloadImage()">Compress & Download</button>
+        <button onclick="downloadImage()">Compress & Download</button>
+      </div>
 
-      <button onclick="whiteBackground()">White Background</button>
-      <button onclick="resetCanvas()">Reset</button>
     </div>
 
-    <canvas id="canvas" width="300" height="400"></canvas>
-    <!-- 🔹 Crop preview (passport ratio) -->
-<canvas id="preview" width="150" height="200"
-        style="border:1px solid #00a3c4; margin-top:10px;"></canvas>
+    <!-- RIGHT PANEL -->
+    <div class="preview-panel">
+      <h3>Main Preview</h3>
+      <canvas id="canvas" width="300" height="400"></canvas>
+
+      <h4>Passport Preview</h4>
+      <canvas id="preview" width="150" height="200"></canvas>
+
+      <div id="status" class="status"></div>
+    </div>
+
   </div>
+</div>
 
-  <script>
-    const upload = document.getElementById('upload');
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    let img = new Image();
+<!-- CORE JS -->
+<script>
+  const upload = document.getElementById('upload');
+  const dropZone = document.getElementById('dropZone');
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  let img = new Image();
 
-    upload.addEventListener('change', function () {
-      const file = this.files[0];
-      if (!file) return;
-      img.onload = () => {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
-      };
-      img.src = URL.createObjectURL(file);
-    });
+  dropZone.onclick = () => upload.click();
 
-    function resizeImage() {
-      const w = document.getElementById('w').value;
-      const h = document.getElementById('h').value;
-      const temp = document.createElement('canvas');
-      temp.width = w;
-      temp.height = h;
-      temp.getContext('2d').drawImage(canvas, 0, 0, w, h);
-      canvas.width = w;
-      canvas.height = h;
-      ctx.drawImage(temp, 0, 0);
-    }
+  dropZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropZone.classList.add('hover');
+  });
 
-    function rotateImage() {
-      const angle = document.getElementById('rotate').value * Math.PI / 180;
-      const temp = document.createElement('canvas');
-      temp.width = canvas.width;
-      temp.height = canvas.height;
-      const tctx = temp.getContext('2d');
-      tctx.translate(canvas.width/2, canvas.height/2);
-      tctx.rotate(angle);
-      tctx.drawImage(canvas, -canvas.width/2, -canvas.height/2);
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      ctx.drawImage(temp,0,0);
-    }
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('hover');
+  });
 
-    function whiteBackground() {
-      ctx.globalCompositeOperation = 'destination-over';
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0,0,canvas.width,canvas.height);
-      ctx.globalCompositeOperation = 'source-over';
-    }
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('hover');
+    upload.files = e.dataTransfer.files;
+    upload.dispatchEvent(new Event('change'));
+  });
 
-    function resetCanvas() {
+  upload.addEventListener('change', () => {
+    const file = upload.files[0];
+    if (!file) return;
+
+    img.onload = () => {
       canvas.width = img.width;
       canvas.height = img.height;
-      ctx.drawImage(img,0,0);
-    }
+      ctx.drawImage(img, 0, 0);
+      setStatus("Image loaded successfully");
+    };
+    img.src = URL.createObjectURL(file);
+  });
 
-    function downloadImage() {
-      const q = document.getElementById('quality').value;
-      const link = document.createElement('a');
-      link.download = 'corrected-image.jpg';
-      link.href = canvas.toDataURL('image/jpeg', q);
-      link.click();
-    }
-  </script>
- <script src="crop-tool.js"></script>
+  function setStatus(msg) {
+    document.getElementById('status').innerText = msg;
+  }
+</script>
+
+<!-- MODULE SCRIPTS (ORDER MATTERS) -->
+<script src="crop-tool.js"></script>
 <script src="crop-advanced.js"></script>
 <script src="icp-rules.js"></script>
 <script src="icp-rules-check.js"></script>
 
-
 </body>
 </html>
-
-
-
-
-
-
-
-
