@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <head>
+  ...
+  <link rel="stylesheet" href="style-icp.css">
+</head>
+
   <meta charset="UTF-8" />
   <title>Auto Image Correction Tool</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +13,21 @@
     body { font-family: Arial, sans-serif; background:#f4f6f8; padding:20px; }
     .container { max-width:800px; margin:auto; background:#fff; padding:20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
     h1 { text-align:center; }
-    .tools { display:flex; flex-wrap:wrap; gap:10px; margin:15px 0; }
+    .tools <div class="tools-section">
+  <h3>Resize</h3>
+  ...
+</div>
+
+<div class="tools-section">
+  <h3>Crop</h3>
+  ...
+</div>
+
+<div class="tools-section">
+  <h3>Rotate & Background</h3>
+  ...
+</div>
+
     input, select { margin:5px 0; }
     canvas { display:block; margin:15px auto; border:1px solid #ccc; background:#fff; }
     button { padding:8px 12px; background:#007bff; color:#fff; border:none; border-radius:5px; cursor:pointer; }
@@ -21,7 +40,28 @@
     <h1>Auto Image Correction</h1>
     <p>Resize • Crop • Rotate • Compress • Background Fill</p>
 
-    <input type="file" id="upload" accept="image/*" />
+    <div id="dropZone" class="drop-zone">
+  <p>Drag & Drop Image Here<br>or Click to Upload</p>
+  <input type="file" id="upload" accept="image/*" hidden />
+</div>
+    const dropZone = document.getElementById('dropZone');
+
+dropZone.onclick = () => upload.click();
+
+dropZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  dropZone.classList.add('hover');
+});
+
+dropZone.addEventListener('dragleave', () => {
+  dropZone.classList.remove('hover');
+});
+
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  upload.files = e.dataTransfer.files;
+  upload.dispatchEvent(new Event('change'));
+});  
 
     <div class="tools">
       <label>Width: <input type="number" id="w" value="300"></label>
@@ -121,14 +161,15 @@
       link.click();
     }
   </script>
-  <script src="crop-tool.js"></script>
-  <link rel="stylesheet" href="style-icp.css">
+ <script src="crop-tool.js"></script>
 <script src="crop-advanced.js"></script>
 <script src="icp-rules.js"></script>
-  <script src="icp-rules-check.js"></script>
+<script src="icp-rules-check.js"></script>
+
 
 </body>
 </html>
+
 
 
 
